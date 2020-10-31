@@ -9,7 +9,7 @@ from matplotlib.ticker import FixedLocator, FixedFormatter
 strHex = lambda x: "%0.2x" % x
 rgb2Hex = lambda c: '0x' + strHex(c[0]) + strHex(c[1]) + strHex(c[2])
 
-day_of_week = lambda i: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][i]
+dow = lambda i: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][i]
 clr = lambda i,j: [['k', 'k', 'k', 'k', 'k', 'k', 'k'],
                     ['k', 'k', 'k', 'k', 'k', 'g', 'g'],
                     ['b', 'k', 'k', 'k', 'k', 'k', 'k']][j][i]
