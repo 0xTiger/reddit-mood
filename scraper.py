@@ -30,21 +30,20 @@ def trav_ord(a, str):
 
 id = 'ei7r4y'
 
-file = 'mood_diary_imgs' + id + '.png'
+file = 'mood_diary_imgs/' + id + '.png'
 info_file = 'assets/temp.csv'
 save_file = 'assets/mood.json'
 
 with open(save_file) as f: orig = json.load(f)
 if id in orig:
-    print("WARNING POST ALREADY SCRAPED, CURRENT WILL BE OVERWRITTEN")
+    print(f"WARNING POST {id} ALREADY SCRAPED, CURRENT WILL BE OVERWRITTEN")
 
 img = io.imread(file)
 
 fig = plt.figure(num = id)
 ax = fig.add_subplot(111)
 
-bkg_clrs = []
-dis_clrs = []
+bkg_clrs, dis_clrs = [], []
 xs, ys = [], []
 def onclick(event):
     valid_click = fig.canvas.manager.toolbar._active is None and event.xdata is not None and event.ydata is not None
@@ -57,17 +56,19 @@ def onclick(event):
             if event.button == 1 and event.key is None:
                 ax.axhline(y)
                 ys.append(y)
-            elif event.button == 1 and event.key == 'b' :
+
+            elif event.button == 1 and event.key == 'b' : #picks background colour
                 bkg_clrs.append(img[y][x])
-                print(bkg_clrs[-1])
-            elif event.button == 1 and event.key == 'v' :
+                print(f'{bkg_clrs[-1]} added to bkg_clrs')
+
+            elif event.button == 1 and event.key == 'v' : #picks mood colour
                 if x < 0 or y < 0:
                     clr = input("Input clr:")
                     dis_clrs.append(list(map(int, clr.split(','))))
-                    print(dis_clrs[-1])
+                    print(f'{dis_clrs[-1]} added to dis_clrs')
                 else:
                     dis_clrs.append(img[y][x])
-                    print(dis_clrs[-1])
+                    print(f'{dis_clrs[-1]} added to dis_clrs')
             elif event.button == 3 and event.key is None:
                 ax.axvline(x)
                 xs.append(x)
@@ -78,11 +79,11 @@ def onclick(event):
 cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
 plt.imshow(img)
-t_o = input("Nodes traversed h or v (h/v)?:")
+t_o = input("Nodes traversed h or v first (h/v)?:")
 plt.show()
 
 days = [img[y][x] for x,y in trav_ord(product(xs, ys), t_o)]
-days = categorise(days, bkg_clrs + dis_clrs )
+days = categorise(days, bkg_clrs + dis_clrs)
 print(days)
 len_days_before = len(days)
 print(len_days_before)
@@ -109,6 +110,6 @@ if input("Save to json (y/n)?:") == 'y':
         with open(save_file, 'w') as o:
             json.dump(orig, o, indent=2)
 
-        print("Saved json @ %s" % save_file)
+        print(f"Saved json @ {save_file}")
     except:
         print("WARNING FAILED SAVE")
