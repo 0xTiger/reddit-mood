@@ -6,26 +6,26 @@ import json
 import statsmodels.api as sm
 
 
-dow = lambda i: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][i]
+dow = lambda i: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][(i + 1) % 7]
 
 data_file = 'assets/mood.json'
 
 with open(data_file) as f:
     data = json.load(f)
 
+normed = []
 for k, v in data.items():
-    v['data'] = [x if x is not None else np.mean([x for x in v['data'] if x is not None]) for x in v['data']]
+    moods = np.array(v['data'], dtype=float)
+    normed.append(10 * np.nan_to_num(moods, nan=np.nanmean(moods)) / len(v['clrs']))
 
-normed = [list(map(lambda x: 10*round(x / len(v['clrs']), 3), v['data'])) for k, v in data.items()]
-moods = [np.mean(x) for x in np.transpose(np.array(normed))]
-
-weekdays = [(i + 1) % 7 for i in range(365)]
-#maybe animate to emphasize cyclical nature
+normed = np.array(normed)
+daily_average_mood = normed.mean(axis=0)
 
 lowess = sm.nonparametric.lowess
 
-df = pd.DataFrame({'x': list(range(365)), 'y': moods, 'dow': map(dow, weekdays)})
+df = pd.DataFrame({'x': list(range(365)), 'y': daily_average_mood})
 df['moving_avg'] = [i[1] for i in lowess(df['y'], df['x'], frac=1./3)]
+df['dow'] = df['x'].map(dow)
 
 weekends = df[df['dow'].isin(['sat', 'sun'])]
 weekends['moving_avg'] = [i[1] for i in lowess(weekends['y'], weekends['x'], frac=1./3)]
