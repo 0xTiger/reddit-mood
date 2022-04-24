@@ -1,25 +1,22 @@
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import csv
 import json
 import statsmodels.api as sm
 
 
 dow = lambda i: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][(i + 1) % 7]
 
-data_file = 'assets/mood.json'
 
-with open(data_file) as f:
+with open('assets/mood.json') as f:
     data = json.load(f)
 
 normed = []
-for k, v in data.items():
+for v in data.values():
     moods = np.array(v['data'], dtype=float)
     normed.append(10 * np.nan_to_num(moods, nan=np.nanmean(moods)) / len(v['clrs']))
 
-normed = np.array(normed)
-daily_average_mood = normed.mean(axis=0)
+daily_average_mood = np.mean(normed, axis=0)
 
 lowess = sm.nonparametric.lowess
 
@@ -46,9 +43,9 @@ fig.update_layout(
     xaxis_title="Month",
     yaxis_title="Average Happiness /10",
     font=dict(size=18, family="Courier New, monospace"),
-    xaxis = dict(
-        tickmode = 'array',
-        tickvals = [0,32,60,91,121,152,182,213,244,274,305,335],
-        ticktext = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+    xaxis=dict(
+        tickmode='array',
+        tickvals=[0,32,60,91,121,152,182,213,244,274,305,335],
+        ticktext=['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
     ))
 fig.show()
